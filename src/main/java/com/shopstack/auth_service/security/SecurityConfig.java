@@ -54,6 +54,15 @@ public class SecurityConfig {
                                 "/api/vendor/register"
                         ).permitAll()
 
+                        .requestMatchers("/api/customer/**")
+                        .hasRole("CUSTOMER")
+
+                        .requestMatchers("/api/vendor/**")
+                        .hasRole("VENDOR")
+
+                        .requestMatchers("/api/admin/**")
+                        .hasRole("ADMIN")
+
                         .anyRequest()
                         .authenticated()
                 )
