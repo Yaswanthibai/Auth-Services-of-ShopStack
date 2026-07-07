@@ -1,6 +1,7 @@
 package com.shopstack.auth_service.security;
 
 import io.jsonwebtoken.Claims;
+import java.util.function.Function;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -38,18 +39,35 @@ public class JwtService {
                 .compact();
     }
 
+    public <T> T extractClaim(
+            String token,
+            Function<Claims, T> claimsResolver) {
+
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    public String extractUsername(
+            String token) {
+
+        return extractClaim(
+                token,
+                Claims::getSubject);
+    }
+
     public String extractEmail(String token) {
 
-        return extractAllClaims(token)
-                .getSubject();
+        return extractUsername(token);
     }
 
     public boolean isTokenValid(
             String token,
             String email) {
 
-        return extractEmail(token)
-                .equals(email)
+        final String username =
+                extractUsername(token);
+
+        return username.equals(email)
                 && !isTokenExpired(token);
     }
 

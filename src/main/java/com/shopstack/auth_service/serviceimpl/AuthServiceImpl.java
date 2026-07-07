@@ -2,11 +2,14 @@ package com.shopstack.auth_service.serviceimpl;
 
 import com.shopstack.auth_service.dto.LoginRequest;
 import com.shopstack.auth_service.dto.LoginResponse;
+import com.shopstack.auth_service.repository.UserRepository;
 import com.shopstack.auth_service.security.JwtService;
 import com.shopstack.auth_service.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import com.shopstack.auth_service.entity.User;
 
 @Service
 @RequiredArgsConstructor
@@ -19,10 +22,23 @@ public class AuthServiceImpl
     private final JwtService
             jwtService;
 
-    @Override
-    public LoginResponse login(
-            LoginRequest request) {
+    private final UserRepository userRepository;
 
-        return null;
+    @Override
+    public LoginResponse login(LoginRequest request) {
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String token = jwtService.generateToken(user.getEmail());
+
+        return new LoginResponse(token);
     }
 }
