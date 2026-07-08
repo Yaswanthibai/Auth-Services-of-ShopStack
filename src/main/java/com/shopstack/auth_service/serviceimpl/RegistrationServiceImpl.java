@@ -44,10 +44,6 @@ public class RegistrationServiceImpl
         Customer customer = Customer.builder()
                 .user(savedUser)
                 .gender(request.getGender())
-                .address(request.getAddress())
-                .city(request.getCity())
-                .state(request.getState())
-                .pincode(request.getPincode())
                 .build();
 
         customerRepository.save(customer);
